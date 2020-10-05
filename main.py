@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Dependencies: install following packages
+#Dependecy of the following packages:
 # pip install matrix-nio
 # for e2e encryption: pip install "matrix-nio[e2e]"
 # pip install nio
@@ -16,10 +16,12 @@ import json
 import os
 import sys
 import getpass
-from PIL import Image
+from PIL import Image   #for handling images
 import aiofiles.os
+import random   #for randomizing
+import shutil   #for handling files
 
-from nio import AsyncClient, LoginResponse, UploadResponse
+from nio import AsyncClient, LoginResponse, UploadResponse  #for matrix
 
 CONFIG_FILE = "credentials.json"
 
@@ -95,12 +97,14 @@ async def send_image(client, room_id, image):
             filename=os.path.basename(image),
             filesize=file_stat.st_size)
     if (isinstance(resp, UploadResponse)):
-        print("Image was uploaded successfully to server. ")
+        print("")
+        #print("Image was uploaded successfully to server. ")
     else:
         print(f"Failed to upload image. Failure response: {resp}")
 
     content = {
-        "body": os.path.basename(image),  # descriptive title, here it's filename, alternative Picture Description
+        #"body": os.path.basename(image),  # descriptive title, here it's filename, alternative Picture Description
+        "body": "",
         "info": {
             "size": file_stat.st_size,
             "mimetype": mime_type,
@@ -119,7 +123,7 @@ async def send_image(client, room_id, image):
             message_type="m.room.message",
             content=content
         )
-        print("Image was sent successfully")
+        #print("Image was sent successfully")
     except Exception:
         print(f"Image send of file {image} failed.")
 
@@ -171,15 +175,35 @@ async def main() -> None:
             client.user_id = config['user_id']
             client.device_id = config['device_id']
 
-        # Now we can send messages as the user
-        room_id = "!myfavouriteroomid:example.org"
-        room_id = input(f"Enter room id for image message: [{room_id}] ")
 
-        image = "exampledir/samplephoto.jpg"
-        image = input(f"Enter file name of image to send: [{image}] ")
+    # Automatic Bulk-Mode:
+        try:
+            #Read in roomlist file if existing. Otherwise switch to manual mode
+            with open('roomlist.txt') as roomlist_file:
+                rooms = [line.rstrip() for line in roomlist_file]
+            
+                for i in rooms:
+                    print(i)
+                    room_id = i
+       
+                    image = "exampledir/samplephoto.jpg"
+                    #send image to matrix-room              
+                    await send_image(client, room_id, foldername + '/' + image)
+                                                            
+                    print("Automatic Mode: Sent one picture to room " + i)           
+            
+        except IOError:
+    # Manual Send
+            print('error automatic mode: roomlist.txt or picture folder missing. Switching to manual mode.')
+            # Now we can send messages as the user
+            room_id = "!myfavouriteroomid:example.org"
+            room_id = input(f"Enter room id for image message: [{room_id}] ")
 
-        await send_image(client, room_id, image)
-        print("Logged in using stored credentials. Sent a test message.")
+            image = "exampledir/samplephoto.jpg"
+            image = input(f"Enter file name of image to send: [{image}] ")
+            
+            await send_image(client, room_id, image)
+            print("Manual Mode: Logged in using stored credentials. Sent one picture.")
 
     # Close the client connection after we are done with it.
     await client.close()
