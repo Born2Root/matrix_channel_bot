@@ -185,11 +185,15 @@ async def main() -> None:
                 for i in rooms:
                     print(i)
                     room_id = i
-       
+                    
+                    #extract foldername (single number token) from complete room_id with special characters
+                    foldername_raw = room_id.split(":")[0]
+                    foldername = foldername_raw[1:] #remove the ! first character
+                    
                     image = "exampledir/samplephoto.jpg"
                     #send image to matrix-room              
                     await send_image(client, room_id, foldername + '/' + image)
-                                                            
+
                     print("Automatic Mode: Sent one picture to room " + i)           
             
         except IOError:
