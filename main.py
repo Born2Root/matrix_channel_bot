@@ -183,7 +183,7 @@ async def main() -> None:
                 rooms = [line.rstrip() for line in roomlist_file]
             
                 for i in rooms:
-                    print(i)
+                    #print(i)
                     room_id = i
                     
                     #extract foldername (single number token) from complete room_id with special characters
@@ -196,6 +196,7 @@ async def main() -> None:
                     await send_image(client, room_id, foldername + '/' + image)
                     
                     #move send picture to subfolder "send". If not existend, folder will be created
+                    #ATTENTION, under Windows first create the send folder manual. Shutil doesnt create proper send folder in windows
                     shutil.move(foldername + '/' + image, foldername + '/send/')
                                         
                     print("Automatic Mode: Sent one picture to room " + i)           
