@@ -1,4 +1,4 @@
-# matrix Channel Bot
+# Matrix Channel Bot
  **Channel Bot for Matrix-Messenger**
  
  The Bot is intended to use Matrix "Rooms" like Telegram Channels.
