@@ -190,10 +190,14 @@ async def main() -> None:
                     foldername_raw = room_id.split(":")[0]
                     foldername = foldername_raw[1:] #remove the ! first character
                     
-                    image = "exampledir/samplephoto.jpg"
+                    #get a random image from folder           
+                    image = random.choice(os.listdir(foldername))
                     #send image to matrix-room              
                     await send_image(client, room_id, foldername + '/' + image)
-
+                    
+                    #move send picture to subfolder "send". If not existend, folder will be created
+                    shutil.move(foldername + '/' + image, foldername + '/send/')
+                                        
                     print("Automatic Mode: Sent one picture to room " + i)           
             
         except IOError:
